@@ -14,6 +14,22 @@ from webdriver_manager.chrome import ChromeDriverManager
 from tqdm import tqdm
 
 UBLOCK_XPI_PATH = os.path.abspath("ublock_origin.xpi")
+UBLOCK_DOWNLOAD_URL = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi"
+
+
+def download_ublock():
+    """Download uBlock Origin .xpi if not present."""
+    try:
+        print("🌐 Downloading uBlock Origin...")
+        response = requests.get(UBLOCK_DOWNLOAD_URL, stream=True)
+        response.raise_for_status()
+        with open(UBLOCK_XPI_PATH, "wb") as f:
+            for chunk in response.iter_content(1024):
+                f.write(chunk)
+        print("✅ uBlock Origin downloaded.")
+    except Exception as e:
+        print(f"⚠️ Failed to download uBlock Origin: {e}")
+
 
 def setup_driver():
     try:
@@ -31,8 +47,19 @@ def setup_driver():
             options=options
         )
 
+        # Auto-download if missing
+        if not os.path.exists(UBLOCK_XPI_PATH):
+            download_ublock()
+
+        # Try to install uBlock if exists
         if os.path.exists(UBLOCK_XPI_PATH):
-            driver.install_addon(UBLOCK_XPI_PATH, temporary=True)
+            try:
+                driver.install_addon(UBLOCK_XPI_PATH, temporary=True)
+                print("✅ uBlock Origin installed.")
+            except Exception as addon_err:
+                print(f"⚠️ Failed to install uBlock Origin: {addon_err}")
+        else:
+            print("⚠️ uBlock Origin not installed (file missing).")
 
         print("✅ Firefox started.")
         return driver
@@ -61,6 +88,7 @@ def setup_driver():
             print(f"❌ Chrome also failed: {chrome_error}")
             raise RuntimeError("No supported browser found. Please install Firefox or Chrome.")
 
+
 def remove_ads(driver):
     ad_selectors = ["iframe", "popup", "ads", "adframe", "ad-container"]
     for selector in ad_selectors:
@@ -70,6 +98,7 @@ def remove_ads(driver):
                 driver.execute_script("arguments[0].remove();", ad)
         except:
             continue
+
 
 def download_file(video_url, save_path):
     print(f"\n⬇️ Downloading to: {save_path}")
@@ -88,6 +117,7 @@ def download_file(video_url, save_path):
                 f.write(chunk)
                 bar.update(len(chunk))
     print("✅ Download complete!")
+
 
 def download_from_hqporner(url, save_dir="downloads"):
     print(f"\n🔄 Launching browser for: {url}")
@@ -145,6 +175,7 @@ def download_from_hqporner(url, save_dir="downloads"):
     finally:
         driver.quit()
 
+
 def download_from_incestflix(url, save_dir="downloads"):
     print(f"\n🔄 Launching browser for: {url}")
     driver = setup_driver()
@@ -176,6 +207,7 @@ def download_from_incestflix(url, save_dir="downloads"):
         print(f"❌ Error: {e}")
     finally:
         driver.quit()
+
 
 def download_from_superporn(url, save_dir="downloads"):
     print(f"\n🔄 Launching browser for: {url}")
@@ -213,6 +245,7 @@ def download_from_superporn(url, save_dir="downloads"):
     finally:
         driver.quit()
 
+
 # ========== MAIN MENU ==========
 if __name__ == "__main__":
     print("🎬 Video Downloader")
@@ -220,11 +253,11 @@ if __name__ == "__main__":
         url = input("🔗 Enter video URL: \n").strip()
         checkUrl = url.split("/")[2]
 
-        if checkUrl == "hqporner.com" or checkUrl == "www.hqporner.com":
+        if checkUrl in ["hqporner.com", "www.hqporner.com"]:
             download_from_hqporner(url)
-        elif checkUrl == "incestflix.com" or checkUrl == "www.incestflix.com":
+        elif checkUrl in ["incestflix.com", "www.incestflix.com"]:
             download_from_incestflix(url)
-        elif checkUrl == "superporn.com" or checkUrl == "www.superporn.com":
+        elif checkUrl in ["superporn.com", "www.superporn.com"]:
             download_from_superporn(url)
         else:
             print("⚠️ Unrecognized site. Attempting with IncestFlix handler...")
