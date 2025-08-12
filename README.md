@@ -4,7 +4,12 @@
 ![Python](https://img.shields.io/badge/python-3.10+-blue)
 ![License](https://img.shields.io/github/license/luisdiaz327/VideoScraper)
 ![Issues](https://img.shields.io/github/issues/luisdiaz327/VideoScraper)
+![Last Commit](https://img.shields.io/github/last-commit/luisdiaz327/VideoScraper)
 ![Stars](https://img.shields.io/github/stars/luisdiaz327/VideoScraper)
+
+![Forks](https://img.shields.io/github/forks/luisdiaz327/VideoScraper?style=social)
+
+
 
 
 A headless browser-based video downloader for adult streaming sites like **HQPorner**, **IncestFlix**, and **SuperPorn**.
